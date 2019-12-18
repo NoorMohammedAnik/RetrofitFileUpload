@@ -8,7 +8,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.provider.MediaStore;
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -19,6 +19,7 @@ import android.widget.Toast;
 
 import java.io.File;
 
+import in.mayanknagwanshi.imagepicker.ImageSelectActivity;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
@@ -28,7 +29,7 @@ import retrofit2.Response;
 
 public class MainActivity extends AppCompatActivity {
 
-    Button btnUpload, btnPicAudio,btnFile,btnMulUpload, btnPickImage, btnPickVideo;
+    Button btnUpload,btnPickBoth, btnPicAudio,btnFile,btnMulUpload, btnPickImage, btnPickVideo;
     String mediaPath, mediaPath1;
     ImageView imgView;
     String[] mediaColumns = {MediaStore.Video.Media._ID};
@@ -52,6 +53,7 @@ public class MainActivity extends AppCompatActivity {
         imgView = (ImageView) findViewById(R.id.preview);
         str1 = (TextView) findViewById(R.id.filename1);
         str2 = (TextView) findViewById(R.id.filename2);
+        btnPickBoth=findViewById(R.id.btn_pick_both);
 
         btnUpload.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -60,6 +62,16 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        btnPickBoth.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(MainActivity.this, ImageSelectActivity.class);
+                intent.putExtra(ImageSelectActivity.FLAG_COMPRESS, false);//default is true
+                intent.putExtra(ImageSelectActivity.FLAG_CAMERA, true);//default is true
+                intent.putExtra(ImageSelectActivity.FLAG_GALLERY, true);//default is true
+                startActivityForResult(intent, 1213);
+            }
+        });
         btnMulUpload.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -139,6 +151,34 @@ public class MainActivity extends AppCompatActivity {
                 cursor.close();
 
             }
+
+
+            // When an Image is picked
+           else if (requestCode == 1213 && resultCode == RESULT_OK && null != data) {
+
+//                // Get the Image from data
+//                Uri selectedImage = data.getData();
+//                String[] filePathColumn = {MediaStore.Images.Media.DATA};
+//
+//                Cursor cursor = getContentResolver().query(selectedImage, filePathColumn, null, null, null);
+//                assert cursor != null;
+//                cursor.moveToFirst();
+//
+//                int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
+//                mediaPath = cursor.getString(columnIndex);
+//                str1.setText(mediaPath);
+//                // Set the Image in ImageView for Previewing the Media
+//                imgView.setImageBitmap(BitmapFactory.decodeFile(mediaPath));
+//                cursor.close();
+
+                mediaPath = data.getStringExtra(ImageSelectActivity.RESULT_FILE_PATH);
+                Bitmap selectedImage = BitmapFactory.decodeFile(mediaPath);
+                imgView.setImageBitmap(selectedImage);
+                str1.setText(mediaPath);
+
+            }
+
+
             // When an Audio is picked
           else  if (requestCode == 2 && resultCode == RESULT_OK && null != data) {
 
